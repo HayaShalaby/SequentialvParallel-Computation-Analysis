@@ -26,7 +26,7 @@ int add(int a, int b)
     return sum;
 }
 
-// Sequential Compute
+// Sequential Compute ------------------------------------------------------------------------------------------------------------
 struct Node { int num; struct Node *next; };
 struct LL { struct Node *head; };
 
@@ -73,7 +73,7 @@ int sequential_compute(char *filename, int (*fp)(int, int)){
     return sum;
 }
 
-// Parallel Compute
+// Parallel Compute ---------------------------------------------------------------------------------------------------------------------
 int read_numbers(char *filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -158,7 +158,7 @@ int parallel_compute(char *filename, int n_proc, int (*fp)(int, int)) {
 }
 
 
-// Mmap
+// Mmap ----------------------------------------------------------------------------------------------------------------------------------
 unsigned long mmap_compute(int num_processes, const char *filename, unsigned long (*func)(int, int)) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
@@ -251,18 +251,20 @@ unsigned long mmap_compute(int num_processes, const char *filename, unsigned lon
     return total;
 }
 
-// Example function to pass to mmap_compute
-unsigned long add_func(int a, int b) {
-    return (unsigned long)(a + b);
-}
+// // Example function to pass to mmap_compute
+// unsigned long add_func(int a, int b) {
+//     return (unsigned long)(a + b);
+// }
 
-// Threads 
+
 // unsigned long int add(unsigned long int a, unsigned long int b) 
 // {
 //     unsigned long int sum = a + b;
 //     return sum;
 // }
     
+
+// Threads -------------------------------------------------------------------------------------------------------------------------------
 int read_numbers_from_file(char *filename) 
 {
     FILE *file = fopen(filename, "r");
@@ -295,7 +297,7 @@ typedef struct
 } thread_data_struct;
 
 
-void *partial_thread_compute(void* arg)
+void *partial_thread_compute(void *arg)
 {
     thread_data_struct* data = (thread_data_struct*) arg;
     
@@ -371,6 +373,8 @@ unsigned long int threads_compute(int num_threads, char *filename, unsigned long
     return final_result;
 }
 
+
+// Main Experiment -----------------------------------------------------------------------------------------------------------------------
 // Timer function to return the current time in milliseconds
 double now_ms() 
 {
@@ -378,7 +382,7 @@ double now_ms()
     return (t.tv_sec * 1000.0) + (t.tv_usec / 1000.0);
 }
 
-// Main Experiment
+
 int main(void) 
 {
     srand(time(NULL));
@@ -396,7 +400,7 @@ int main(void)
 
     int fixed_proc = 8;
     int fixed_threads = 8;
-    for (int N = 10; N <= 100000; N += (N < 1000 ? 100 : 2000)) 
+    for (int N = 10; N <= 50000; N += (N < 1000 ? 100 : 1225)) 
     {
         char filename[64];
         sprintf(filename, "data_%d.txt", N);
@@ -451,18 +455,32 @@ int main(void)
         fprintf(csv2, "n_proc,Sequential_ms,Parallel_ms,Speedup,Mmap_ms,Threads_ms\n");
     }
 
-    int fixed_N = 10000;
+    int fixed_N = 3000;
     char filename2[64];
     sprintf(filename2, "data_fixedN.txt");
     FILE *f = fopen(filename2, "w");
     for (int i = 0; i < fixed_N; i++)
     {
-        fprintf(f, "%d\n", rand() % 1000);
+        fprintf(f, "%d\n", rand() % 5);
     }
     fclose(f);
 
-    int procs[] = {1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40};
-    int threads[] = {1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 28, 32, 40};
+    int procs[50] = {
+    1, 2, 4, 6, 8, 10, 12, 14, 16, 18,
+    20, 22, 24, 26, 28, 30, 32, 34, 36, 38,
+    40, 42, 44, 46, 48, 50, 52, 54, 56, 58,
+    60, 62, 64, 66, 68, 70, 72, 74, 76, 78,
+    80, 82, 84, 86, 88, 90, 92, 94, 96, 100
+    };
+
+    int threads[50] = {
+    1, 2, 4, 6, 8, 10, 12, 14, 16, 18,
+    20, 22, 24, 26, 28, 30, 32, 34, 36, 38,
+    40, 42, 44, 46, 48, 50, 52, 54, 56, 58,
+    60, 62, 64, 66, 68, 70, 72, 74, 76, 78,
+    80, 82, 84, 86, 88, 90, 92, 94, 96, 100
+    };
+
     int num_procs = sizeof(procs) / sizeof(procs[0]); // = num_threads
     int num_threads = num_procs;
 
@@ -518,5 +536,3 @@ int main(void)
     printf("   nworkers_vs_Time_p5.csv\n");
     return 0;
 }
-
-
